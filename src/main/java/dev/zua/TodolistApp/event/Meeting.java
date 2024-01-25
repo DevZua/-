@@ -1,6 +1,8 @@
 package dev.zua.TodolistApp.event;
 
-import java.time.Duration;
+import dev.zua.TodolistApp.event.update.AbstractAuditableEvent;
+import dev.zua.TodolistApp.event.update.UpdateMeeting;
+
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -29,5 +31,19 @@ public class Meeting extends AbstractEvent{
     @Override
     public boolean support(EventType type) {
         return type == EventType.MEETING;  // 전달받은 타입이 MEETING과 동일한지 볼것.
+    }
+
+    public void update() {
+
+    }
+
+    @Override
+    protected void update(AbstractAuditableEvent update) {
+        UpdateMeeting meetingUpdate = (UpdateMeeting) update;
+
+        this.participants = meetingUpdate.getParticipants();
+        this.meetingRoom = meetingUpdate.getMeetingRoom();
+        this.agenda = meetingUpdate.getAgenda();
+
     }
 }

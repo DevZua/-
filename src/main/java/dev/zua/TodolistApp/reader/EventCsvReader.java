@@ -19,8 +19,7 @@ import java.util.List;
 
 // CSV 파일을 읽어서 JAVA로 변환하여 반환하는 기능
 public class EventCsvReader {
-    @SneakyThrows
-    public List<Meeting> readMeetings(String path) {
+    public List<Meeting> readMeetings(String path) throws IOException {
         List<Meeting> result = new ArrayList<>();
 
         // 데이터를 읽는 부분
@@ -31,41 +30,25 @@ public class EventCsvReader {
             }
 
             String[] each = read.get(i);
-
+            int id;
+            try {
+                id = Integer.parseInt(each[1]); // id
+            } catch(NumberFormatException e) {
+                System.out.println("Invalid input in CSV file: " + each[1]);
+                continue;
+            }
             result.add(
                     new Meeting(
-                            Integer.parseInt(read.get(i)[0]), // id
+                            id, // id
                             each[2], // title
-
-                            // StartAt
-                            ZonedDateTime.of(
-                                    LocalDateTime.parse(
-                                            each[6],
-                                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                                    ),
-                                    ZoneId.of("Asia/Seoul")
-                            ),
-
-                            // EndAt
-                            ZonedDateTime.of(
-                                    LocalDateTime.parse(
-                                            each[7],
-                                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                                    ),
-                                    ZoneId.of("Asia/Seoul")
-                            ),
-
-                            // participants
+                            ZonedDateTime.of(LocalDateTime.parse(each[6], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), ZoneId.of("Asia/Seoul")),
+                            ZonedDateTime.of(LocalDateTime.parse(each[7], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), ZoneId.of("Asia/Seoul")),
                             new HashSet<>(Arrays.asList(each[3].split(","))),
-
                             each[4], // meetingRoom
                             each[5] // agenda
                     )
             );
         }
-
-
-        // Meeting 으로 변환 부분
 
         return result;
     }

@@ -1,5 +1,6 @@
 package dev.zua.TodolistApp.event;
 
+import dev.zua.TodolistApp.event.update.AbstractAuditableEvent;
 import dev.zua.TodolistApp.exception.InvalidEventException;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,4 +46,23 @@ public abstract class AbstractEvent implements Event {
 
         this.deletedYn = false;  // 처음 객체를 생성할 때는 삭제가 안됐으니까 false
     }
+
+    public void validateAndUpdate(AbstractAuditableEvent update) {
+        if (deletedYn == true) {  // 삭제됐으면 수정 못하게
+            throw new RuntimeException("이미 삭제된 이벤트는 수정할 수 없습니다.");
+        }
+
+        defaultupdate(update);
+        update(update);
+    }
+
+    private void defaultupdate(AbstractAuditableEvent update) {
+        this.title = update.getTitle();
+        this.startAt = update.getStartAt();
+        this.endAt = update.getEndAt();
+        this.duration = Duration.between(this.startAt, this.endAt);
+        this.modifiedAt = ZonedDateTime.now();
+    }
+
+    protected abstract void update(AbstractAuditableEvent update);
 }
