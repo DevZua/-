@@ -34,3 +34,7 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.withType(JavaExec) {
+	jvmArgs "-XX:+EnableDynamicAgentLoading", "-Djdk.instrument.traceUsage"
+}

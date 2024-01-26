@@ -19,11 +19,17 @@ import java.util.List;
 
 // CSV 파일을 읽어서 JAVA로 변환하여 반환하는 기능
 public class EventCsvReader {
+
+    private final RawCsvReader rawCsvReader;
+
+    public EventCsvReader(RawCsvReader rawCsvReader) {
+        this.rawCsvReader = rawCsvReader;
+    }
     public List<Meeting> readMeetings(String path) throws IOException {
         List<Meeting> result = new ArrayList<>();
 
         // 데이터를 읽는 부분
-        List<String[]> read = readAll(path);
+        List<String[]> read = rawCsvReader.readAll(path);
         for (int i = 0; i < read.size(); i++) {
             if (skipHeader(i)) {
                 continue;
@@ -32,9 +38,9 @@ public class EventCsvReader {
             String[] each = read.get(i);
             int id;
             try {
-                id = Integer.parseInt(each[1]); // id
+                id = Integer.parseInt(each[0]); // id
             } catch(NumberFormatException e) {
-                System.out.println("Invalid input in CSV file: " + each[1]);
+                System.out.println("Invalid input in CSV file: " + each[0]);
                 continue;
             }
             result.add(
@@ -57,11 +63,4 @@ public class EventCsvReader {
         return i == 0;
     }
 
-    private List<String[]> readAll(String path) throws IOException {
-        InputStream in = getClass().getResourceAsStream(path);
-        InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
-
-        CSVReader csvReader = new CSVReader(reader);
-        return csvReader.readAll();
-    }
 }
